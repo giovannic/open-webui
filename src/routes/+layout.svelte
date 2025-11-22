@@ -609,6 +609,24 @@
 			console.log('Backend config:', backendConfig);
 		} catch (error) {
 			console.error('Error loading backend config:', error);
+			// Provide minimal default config for custom backends
+			backendConfig = {
+				name: 'App',
+				version: '1.0.0',
+				features: {
+					enable_websocket: true,
+					enable_community_sharing: false,
+					enable_admin_chat_access: false
+				},
+				audio: {
+					stt: { engine: 'web' },
+					tts: { engine: '', voice: '' }
+				},
+				ui: {
+					pending_user_overlay_title: 'Pending Approval'
+				},
+				default_models: ''
+			};
 		}
 		// Initialize i18n even if we didn't get a backend config,
 		// so `/error` can show something that's not `undefined`.
