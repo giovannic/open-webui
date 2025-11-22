@@ -10,6 +10,7 @@
 	import { getContext as getContextAPI } from
 		'$lib/apis/contexts';
 	import Spinner from '../common/Spinner.svelte';
+	import Markdown from '../chat/Messages/Markdown.svelte';
 	import ContextEntries from './ContextEntries.svelte';
 	import AddEntryInput from './AddEntryInput.svelte';
 	import ContextReadmeEditor from
@@ -35,17 +36,15 @@
 				$contextId,
 				'asc',
 				20,
-				currentOffset + 20
+				currentOffset
 			);
-			currentOffset += 20;
+			currentOffset += response.entries.length;
 			contextEntries.update((entries) => [
 				...entries,
 				...response.entries
 			]);
 
-			if (
-				currentOffset + 20 >= response.total
-			) {
+			if (currentOffset >= response.total) {
 				allEntriesLoaded = true;
 			}
 		} catch (error) {
@@ -71,7 +70,7 @@
 	<!-- README Section -->
 	<div
 		class="border-b border-gray-200 dark:border-gray-700
-			px-6 py-4 bg-white dark:bg-gray-900"
+			px-4 sm:px-6 py-4 bg-white dark:bg-gray-900"
 	>
 		<div class="flex items-center justify-between mb-2">
 			<button
@@ -99,9 +98,10 @@
 		</div>
 
 		{#if !readmeCollapsed}
-			<div class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+			<div class="text-sm text-gray-600 dark:text-gray-400
+				mt-2 markdown-content">
 				{#if $contextReadme}
-					<p>{@html $contextReadme}</p>
+					<Markdown content={$contextReadme} />
 				{:else}
 					<p class="italic">
 						{$i18n.t('No README set')}
@@ -126,13 +126,13 @@
 			dark:bg-gray-900"
 	>
 		<!-- Entries List -->
-		<div class="flex-1 px-6 py-4">
+		<div class="flex-1 px-4 sm:px-6 py-4">
 			<ContextEntries />
 		</div>
 
 		<!-- Load More Button -->
 		{#if !allEntriesLoaded && $contextEntries.length > 0}
-			<div class="px-6 py-4 border-t border-gray-200
+			<div class="px-4 sm:px-6 py-4 border-t border-gray-200
 				dark:border-gray-700 text-center">
 				<button
 					on:click={loadMoreEntries}
@@ -155,8 +155,8 @@
 	</div>
 
 	<!-- Input Section -->
-	<div class="border-t border-gray-200 dark:border-gray-700 px-6 py-4
-		bg-white dark:bg-gray-900">
+	<div class="border-t border-gray-200 dark:border-gray-700
+		px-4 sm:px-6 py-4 bg-white dark:bg-gray-900">
 		<AddEntryInput {token} />
 	</div>
 </div>
@@ -169,5 +169,33 @@
 <style>
 	:global(body) {
 		overflow: hidden;
+	}
+
+	:global(.markdown-content) {
+		font-size: 0.95rem;
+		line-height: 1.6;
+	}
+
+	:global(.markdown-content :first-child) {
+		margin-top: 0;
+	}
+
+	:global(.markdown-content :last-child) {
+		margin-bottom: 0;
+	}
+
+	:global(.markdown-content pre) {
+		background-color: rgba(0, 0, 0, 0.1);
+		padding: 0.75rem;
+		border-radius: 0.375rem;
+		overflow-x: auto;
+		margin: 0.5rem 0;
+	}
+
+	:global(.markdown-content code) {
+		background-color: rgba(0, 0, 0, 0.1);
+		padding: 0.125rem 0.375rem;
+		border-radius: 0.25rem;
+		font-family: monospace;
 	}
 </style>
